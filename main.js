@@ -42,8 +42,8 @@ function preloadAllAssets() {
     const imageUrls = [];
     images.forEach(img => {
         const src = img.getAttribute('src'); const dataSrc = img.getAttribute('data-src');
-        if (src && src !== "") imageUrls.push(src);
-        if (dataSrc && dataSrc !== "") imageUrls.push(dataSrc);
+        if (src && src !== "" && !src.startsWith('data:')) imageUrls.push(src);
+        if (dataSrc && dataSrc !== "" && !dataSrc.startsWith('data:')) imageUrls.push(dataSrc);
     });
 
     const audios = Array.from(document.querySelectorAll('audio source')).map(src => src.getAttribute('src'));
@@ -55,7 +55,7 @@ function preloadAllAssets() {
     const preloaderText = document.getElementById('preloader-text');
 
     if (totalAssets === 0) {
-        allAssetsLoaded = true; loadProgress = 100; finishLoading(); return;
+        finishLoading(); return;
     }
 
     function checkLoad() {
@@ -67,8 +67,19 @@ function preloadAllAssets() {
             else if(loadProgress < 80) preloaderText.innerText = "RENDERING PIXELS...";
             else preloaderText.innerText = "WAKING UP LUIJI...";
         }
-        if (loadedCount >= totalAssets) { allAssetsLoaded = true; finishLoading(); }
+        if (loadedCount >= totalAssets) { 
+            allAssetsLoaded = true; 
+            finishLoading(); 
+        }
     }
+
+    setTimeout(() => {
+        if (!allAssetsLoaded) {
+            console.warn("Force bypass loader...");
+            allAssetsLoaded = true;
+            finishLoading();
+        }
+    }, 5000); 
 
     allAssets.forEach(url => {
         if (url.match(/\.(mp3|wav|ogg)$/i)) {
@@ -79,16 +90,6 @@ function preloadAllAssets() {
             img.onload = checkLoad; img.onerror = checkLoad; img.src = url;
         }
     });
-
-        // --- TAMBAHAN KODE DARURAT DI MAIN.JS ---
-        // Force buka web kalau loading kelamaan (antisipasi stuck di HP)
-        setTimeout(() => {
-            if (!allAssetsLoaded) {
-                console.warn("Loading kelamaan, force open web...");
-                allAssetsLoaded = true;
-                finishLoading();
-            }
-        }, 8000); // 8 detik maksimal loading
 }
 
 function finishLoading() {
@@ -96,55 +97,52 @@ function finishLoading() {
     const preloader = document.getElementById('preloader');
     
     if(preloaderBrand) gsap.to(preloaderBrand, { y: 0, duration: 0.8, ease: "power3.out" });
-    
-    // Pastikan status emang beneran kelar
     allAssetsLoaded = true;
-
+    
     setTimeout(() => {
         gsap.to(preloader, { 
-            yPercent: -100, 
-            duration: 1.2, 
-            ease: "expo.inOut",
-            display: "none", // Biar beneran ilang dari layar
+            yPercent: -100, duration: 1.2, ease: "expo.inOut", display: "none",
             onComplete: () => {
                 window.lenis.start();
+                gsap.from(".hero-text-1 h1, .hero-text-1 p", { y: 30, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power3.out" });
                 initScrollAnimations();
-                // Refresh scrolltrigger biar ngga ngebug di HP
                 ScrollTrigger.refresh();
             }
         });
     }, 600);
 }
 
-// 3. Setup Dynamic Events (Modal & Hovers)
+// 3. Setup Dynamic Events
 function setupDynamicEvents() {
-    // Re-attach cursor hover generic
-    document.querySelectorAll('.interactive').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            window.isHoveringInteractive = true;
-            if(document.getElementById('cursor')) { 
-                document.getElementById('cursor').classList.remove('idle-active'); 
-                document.getElementById('cursor').classList.add('hover-active'); 
-            }
-            if(window.isMusicPlaying && !window.isContextActive && !window.isDizzy && !window.isEvil) { 
-                let snd = document.getElementById('sfx-hover');
-                if(snd){ snd.currentTime = 0; snd.volume = 0.2; snd.play().catch(()=>{}); }
-            }
-        });
-        el.addEventListener('mouseleave', () => { 
-            window.isHoveringInteractive = false;
-            if(document.getElementById('cursor')) document.getElementById('cursor').classList.remove('hover-active');
-            if(typeof window.resetIdleTimer === 'function') window.resetIdleTimer();
-        });
-    });
+    // Deteksi Layar HP untuk matiin event hover custom cursor
+    const isMobile = window.innerWidth <= 768;
 
-    // Re-attach context events for Marquee Clients
-    document.querySelectorAll('.marquee-container').forEach(m => {
-        m.addEventListener('mouseenter', () => { window.isHoveringInteractive = true; if(window.triggerContextLuiji) window.triggerContextLuiji("We only work with the <span class='highlight'>best.</span>", ".eye-normal", ".mouth-flat", {sunglasses: true}); });
-        m.addEventListener('mouseleave', () => { window.isHoveringInteractive = false; if(window.removeContextLuiji) window.removeContextLuiji(); });
-    });
+    if (!isMobile) {
+        document.querySelectorAll('.interactive').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                window.isHoveringInteractive = true;
+                if(document.getElementById('cursor')) { 
+                    document.getElementById('cursor').classList.remove('idle-active'); 
+                    document.getElementById('cursor').classList.add('hover-active'); 
+                }
+                if(window.isMusicPlaying && !window.isContextActive && !window.isDizzy && !window.isEvil) { 
+                    let snd = document.getElementById('sfx-hover');
+                    if(snd){ snd.currentTime = 0; snd.volume = 0.2; snd.play().catch(()=>{}); }
+                }
+            });
+            el.addEventListener('mouseleave', () => { 
+                window.isHoveringInteractive = false;
+                if(document.getElementById('cursor')) document.getElementById('cursor').classList.remove('hover-active');
+                if(typeof window.resetIdleTimer === 'function') window.resetIdleTimer();
+            });
+        });
 
-    // Re-attach Project Modal
+        document.querySelectorAll('.marquee-container').forEach(m => {
+            m.addEventListener('mouseenter', () => { window.isHoveringInteractive = true; if(window.triggerContextLuiji) window.triggerContextLuiji("We only work with the <span class='highlight'>best.</span>", ".eye-normal", ".mouth-flat", {sunglasses: true}); });
+            m.addEventListener('mouseleave', () => { window.isHoveringInteractive = false; if(window.removeContextLuiji) window.removeContextLuiji(); });
+        });
+    }
+
     const modal = document.getElementById('project-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalDesc = document.getElementById('modal-desc');
@@ -217,11 +215,13 @@ if (closeModalBtn) {
     });
 }
 
-// 4. GSAP Animations
+// 4. GSAP Animations (Deteksi HP vs Laptop)
 gsap.registerPlugin(ScrollTrigger);
 
 function initScrollAnimations() {
     ScrollTrigger.refresh();
+    const isMobile = window.innerWidth <= 768;
+
     gsap.set(".hero-text-2", { filter: "blur(15px)", scale: 1.05, y: 0, opacity: 0 });
     const heroTl = gsap.timeline({ scrollTrigger: { trigger: ".hero-section", start: "top top", end: "+=4000", pin: true, scrub: 2 }});
     heroTl.to(".hero-text-1", { opacity: 0, filter: "blur(15px)", scale: 0.95, duration: 1.5, ease: "sine.inOut" }, "start")
@@ -231,19 +231,23 @@ function initScrollAnimations() {
           .to(".hero-text-2", { y: -80, opacity: 0, filter: "blur(15px)", scale: 0.95, duration: 1.5, ease: "power2.inOut" })
           .to({}, { duration: 0.5 });
 
-    let horizontalSection = document.querySelector('#sec-branding');
-    let horizontalWrap = document.querySelector('.horizontal-wrap');
-    if(horizontalSection && horizontalWrap) {
-        gsap.to(horizontalWrap, {
-            x: () => -(horizontalWrap.scrollWidth - window.innerWidth), ease: "none",
-            scrollTrigger: { trigger: horizontalSection, pin: true, scrub: 1, end: () => "+=" + (horizontalWrap.scrollWidth - window.innerWidth), invalidateOnRefresh: true }
+    // HANYA JALAN DI PC/LAPTOP
+    if (!isMobile) {
+        let horizontalSection = document.querySelector('#sec-branding');
+        let horizontalWrap = document.querySelector('.horizontal-wrap');
+        if(horizontalSection && horizontalWrap) {
+            gsap.to(horizontalWrap, {
+                x: () => -(horizontalWrap.scrollWidth - window.innerWidth), ease: "none",
+                scrollTrigger: { trigger: horizontalSection, pin: true, scrub: 1, end: () => "+=" + (horizontalWrap.scrollWidth - window.innerWidth), invalidateOnRefresh: true }
+            });
+        }
+
+        gsap.utils.toArray('.parallax-col').forEach(col => {
+            gsap.to(col, { y: col.dataset.speed, ease: "none", scrollTrigger: { trigger: "#sec-concept", start: "top bottom", end: "bottom top", scrub: 1 } });
         });
     }
 
-    gsap.utils.toArray('.parallax-col').forEach(col => {
-        gsap.to(col, { y: col.dataset.speed, ease: "none", scrollTrigger: { trigger: "#sec-concept", start: "top bottom", end: "bottom top", scrub: 1 } });
-    });
-
+    // Product Spotlight Animation
     const spotlightImg = document.getElementById('spotlight-img');
     const productItems = gsap.utils.toArray('.product-list-item');
     productItems.forEach((item) => {
@@ -296,7 +300,6 @@ function updateSoundUI(isPlaying) {
     }
 }
 
-// Global click event to init audio
 document.addEventListener('click', (e) => {
     const themeBtn = document.getElementById('theme-toggle');
     if (soundToggleBtn && soundToggleBtn.contains(e.target)) return;
@@ -307,15 +310,11 @@ document.addEventListener('click', (e) => {
 }, { once: true });
 
 if (soundToggleBtn) {
-    // [FIX]: Tambahin sensor hover buat tombol musik
-    soundToggleBtn.addEventListener('mouseenter', () => { 
-        window.isHoveringInteractive = true; 
-        if(window.triggerContextLuiji) window.triggerContextLuiji(window.isMusicPlaying ? "Let's <span class='highlight'>pause</span> it?" : "Turn up the <span class='highlight'>beat!</span>", ".eye-happy", ".mouth-smile", {blush: 0.4}); 
-    });
-    soundToggleBtn.addEventListener('mouseleave', () => { 
-        window.isHoveringInteractive = false; 
-        if(window.removeContextLuiji) window.removeContextLuiji(); 
-    });
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+        soundToggleBtn.addEventListener('mouseenter', () => { window.isHoveringInteractive = true; if(window.triggerContextLuiji) window.triggerContextLuiji(window.isMusicPlaying ? "Let's <span class='highlight'>pause</span> it?" : "Turn up the <span class='highlight'>beat!</span>", ".eye-happy", ".mouth-smile", {blush: 0.4}); });
+        soundToggleBtn.addEventListener('mouseleave', () => { window.isHoveringInteractive = false; if(window.removeContextLuiji) window.removeContextLuiji(); });
+    }
 
     soundToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -358,21 +357,22 @@ const closeContactModal = () => {
         if(snd){ snd.currentTime = 0; snd.volume = 0.5; snd.play().catch(()=>{}); }
     }
     gsap.to(".contact-box", { y: 20, duration: 0.5, ease: "power2.in" });
-    gsap.to(contactModal, { autoAlpha: 0, duration: 0.5, pointerEvents: 'none', onComplete: () => window.lenis.start() });
+    gsap.to(contactModal, { autoAlpha: 0, duration: 0.5, pointerEvents: 'none', onComplete: () => {
+        window.lenis.start();
+        if(document.getElementById('cursor') && window.innerWidth > 768) {
+            document.getElementById('cursor').style.opacity = "1";
+            document.getElementById('cursor').style.display = "flex";
+        }
+    }});
 };
 if(closeContactBtn) closeContactBtn.addEventListener('click', closeContactModal);
 
-// [FIX]: Tambahin sensor hover pas ngisi form 
-document.querySelectorAll('#contact-form input, #contact-form textarea').forEach(input => {
-    input.addEventListener('focus', () => { 
-        window.isHoveringInteractive = true; 
-        if(window.triggerContextLuiji) window.triggerContextLuiji("Writing something <span class='highlight'>nice?</span>", ".eye-happy", ".mouth-w"); 
+if (!window.innerWidth <= 768) {
+    document.querySelectorAll('#contact-form input, #contact-form textarea').forEach(input => {
+        input.addEventListener('focus', () => { window.isHoveringInteractive = true; if(window.triggerContextLuiji) window.triggerContextLuiji("Writing something <span class='highlight'>nice?</span>", ".eye-happy", ".mouth-w"); });
+        input.addEventListener('blur', () => { window.isHoveringInteractive = false; if(window.removeContextLuiji) window.removeContextLuiji(); });
     });
-    input.addEventListener('blur', () => { 
-        window.isHoveringInteractive = false; 
-        if(window.removeContextLuiji) window.removeContextLuiji(); 
-    });
-});
+}
 
 if(contactForm) {
     contactForm.addEventListener('submit', (e) => {
@@ -389,13 +389,13 @@ if(contactForm) {
         .then(() => {
             successMsg.classList.add('show');
             submitBtnText.innerText = "SENT";
-            if(window.triggerContextLuiji) window.triggerContextLuiji("Message <span class='highlight'>sent!</span>", ".eye-happy", ".mouth-w", {blush: 0.8}); 
+            if(window.triggerContextLuiji && window.innerWidth > 768) window.triggerContextLuiji("Message <span class='highlight'>sent!</span>", ".eye-happy", ".mouth-w", {blush: 0.8}); 
             setTimeout(() => { contactForm.reset(); closeContactModal(); submitBtnText.innerText = originalText; if(window.removeContextLuiji) window.removeContextLuiji(); }, 2500);
         })
         .catch((error) => {
             successMsg.classList.add('show');
             submitBtnText.innerText = "SENT";
-            if(window.triggerContextLuiji) window.triggerContextLuiji("Looks good! We're ready for <span class='highlight'>Netlify.</span>", ".eye-normal", ".mouth-smile", {sunglasses: true}); 
+            if(window.triggerContextLuiji && window.innerWidth > 768) window.triggerContextLuiji("Looks good! We're ready for <span class='highlight'>Netlify.</span>", ".eye-normal", ".mouth-smile", {sunglasses: true}); 
             setTimeout(() => { contactForm.reset(); closeContactModal(); submitBtnText.innerText = originalText; if(window.removeContextLuiji) window.removeContextLuiji(); }, 2500);
         });
     });
@@ -411,15 +411,11 @@ themeIcons.forEach(icon => icon.classList.add('hidden'));
 document.querySelector('.theme-icon-light').classList.remove('hidden');
 
 if (themeToggleBtn) {
-    // [FIX]: Tambahin sensor hover buat tombol tema
-    themeToggleBtn.addEventListener('mouseenter', () => { 
-        window.isHoveringInteractive = true; 
-        if(window.triggerContextLuiji) window.triggerContextLuiji("Changing <span class='highlight'>vibes?</span>", ".eye-normal", ".mouth-w"); 
-    });
-    themeToggleBtn.addEventListener('mouseleave', () => { 
-        window.isHoveringInteractive = false; 
-        if(window.removeContextLuiji) window.removeContextLuiji(); 
-    });
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+        themeToggleBtn.addEventListener('mouseenter', () => { window.isHoveringInteractive = true; if(window.triggerContextLuiji) window.triggerContextLuiji("Changing <span class='highlight'>vibes?</span>", ".eye-normal", ".mouth-w"); });
+        themeToggleBtn.addEventListener('mouseleave', () => { window.isHoveringInteractive = false; if(window.removeContextLuiji) window.removeContextLuiji(); });
+    }
 
     themeToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -432,19 +428,19 @@ if (themeToggleBtn) {
             if(window.treeMesh) { window.treeMesh.material.color.setHex(0x000000); window.treeMesh.material.opacity = 0.45; }
             if(window.starMat) window.starMat.color.setHex(0x000000); if(window.cloudMat) window.cloudMat.color.setHex(0xcccccc); 
             if(window.fFloorMat) window.fFloorMat.color.setHex(0xcccccc); if(window.cityMat) window.cityMat.color.setHex(0xbbbbbb);
-            if(window.triggerContextLuiji) window.triggerContextLuiji("Whoa, it's <span class='highlight'>bright!</span>", ".eye-dizzy", ".mouth-o", {sunglasses: true});
+            if(window.triggerContextLuiji && !isMobile) window.triggerContextLuiji("Whoa, it's <span class='highlight'>bright!</span>", ".eye-dizzy", ".mouth-o", {sunglasses: true});
         } else if (newTheme === 'cyberpunk') {
             if(window.terrainMat) { window.terrainMat.color.setHex(0x00ffcc); window.terrainMat.opacity = 0.2; }
             if(window.treeMesh) { window.treeMesh.material.color.setHex(0xff00ff); window.treeMesh.material.opacity = 0.3; }
             if(window.starMat) window.starMat.color.setHex(0x00ffcc); if(window.cloudMat) window.cloudMat.color.setHex(0x0088aa); 
             if(window.fFloorMat) window.fFloorMat.color.setHex(0xff00ff); if(window.cityMat) window.cityMat.color.setHex(0x00ffcc);
-            if(window.triggerContextLuiji) window.triggerContextLuiji("Entering the <span class='highlight'>matrix...</span>", ".eye-angry", ".mouth-w", {sunglasses: true});
+            if(window.triggerContextLuiji && !isMobile) window.triggerContextLuiji("Entering the <span class='highlight'>matrix...</span>", ".eye-angry", ".mouth-w", {sunglasses: true});
         } else {
             if(window.terrainMat) { window.terrainMat.color.setHex(0xcccccc); window.terrainMat.opacity = 0.2; }
             if(window.treeMesh) { window.treeMesh.material.color.setHex(0xffffff); window.treeMesh.material.opacity = 0.3; }
             if(window.starMat) window.starMat.color.setHex(0xffffff); if(window.cloudMat) window.cloudMat.color.setHex(0x666666); 
             if(window.fFloorMat) window.fFloorMat.color.setHex(0x333333); if(window.cityMat) window.cityMat.color.setHex(0x555555);
-            if(window.triggerContextLuiji) window.triggerContextLuiji("Back to the <span class='highlight'>shadows.</span>", ".eye-happy", ".mouth-smile", {blush: 0.5});
+            if(window.triggerContextLuiji && !isMobile) window.triggerContextLuiji("Back to the <span class='highlight'>shadows.</span>", ".eye-happy", ".mouth-smile", {blush: 0.5});
         }
     });
 }
