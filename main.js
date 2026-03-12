@@ -99,7 +99,7 @@ function finishLoading() {
 
 // 3. Setup Dynamic Events (Modal & Hovers)
 function setupDynamicEvents() {
-    // Re-attach cursor hover
+    // Re-attach cursor hover generic
     document.querySelectorAll('.interactive').forEach(el => {
         el.addEventListener('mouseenter', () => {
             window.isHoveringInteractive = true;
@@ -277,6 +277,7 @@ function updateSoundUI(isPlaying) {
     }
 }
 
+// Global click event to init audio
 document.addEventListener('click', (e) => {
     const themeBtn = document.getElementById('theme-toggle');
     if (soundToggleBtn && soundToggleBtn.contains(e.target)) return;
@@ -287,6 +288,16 @@ document.addEventListener('click', (e) => {
 }, { once: true });
 
 if (soundToggleBtn) {
+    // [FIX]: Tambahin sensor hover buat tombol musik
+    soundToggleBtn.addEventListener('mouseenter', () => { 
+        window.isHoveringInteractive = true; 
+        if(window.triggerContextLuiji) window.triggerContextLuiji(window.isMusicPlaying ? "Let's <span class='highlight'>pause</span> it?" : "Turn up the <span class='highlight'>beat!</span>", ".eye-happy", ".mouth-smile", {blush: 0.4}); 
+    });
+    soundToggleBtn.addEventListener('mouseleave', () => { 
+        window.isHoveringInteractive = false; 
+        if(window.removeContextLuiji) window.removeContextLuiji(); 
+    });
+
     soundToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.isMusicPlaying) {
@@ -332,6 +343,18 @@ const closeContactModal = () => {
 };
 if(closeContactBtn) closeContactBtn.addEventListener('click', closeContactModal);
 
+// [FIX]: Tambahin sensor hover pas ngisi form 
+document.querySelectorAll('#contact-form input, #contact-form textarea').forEach(input => {
+    input.addEventListener('focus', () => { 
+        window.isHoveringInteractive = true; 
+        if(window.triggerContextLuiji) window.triggerContextLuiji("Writing something <span class='highlight'>nice?</span>", ".eye-happy", ".mouth-w"); 
+    });
+    input.addEventListener('blur', () => { 
+        window.isHoveringInteractive = false; 
+        if(window.removeContextLuiji) window.removeContextLuiji(); 
+    });
+});
+
 if(contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault(); 
@@ -369,6 +392,16 @@ themeIcons.forEach(icon => icon.classList.add('hidden'));
 document.querySelector('.theme-icon-light').classList.remove('hidden');
 
 if (themeToggleBtn) {
+    // [FIX]: Tambahin sensor hover buat tombol tema
+    themeToggleBtn.addEventListener('mouseenter', () => { 
+        window.isHoveringInteractive = true; 
+        if(window.triggerContextLuiji) window.triggerContextLuiji("Changing <span class='highlight'>vibes?</span>", ".eye-normal", ".mouth-w"); 
+    });
+    themeToggleBtn.addEventListener('mouseleave', () => { 
+        window.isHoveringInteractive = false; 
+        if(window.removeContextLuiji) window.removeContextLuiji(); 
+    });
+
     themeToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         currentThemeIndex = (currentThemeIndex + 1) % 3; const newTheme = themeNames[currentThemeIndex];
