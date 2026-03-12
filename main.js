@@ -79,6 +79,16 @@ function preloadAllAssets() {
             img.onload = checkLoad; img.onerror = checkLoad; img.src = url;
         }
     });
+
+        // --- TAMBAHAN KODE DARURAT DI MAIN.JS ---
+        // Force buka web kalau loading kelamaan (antisipasi stuck di HP)
+        setTimeout(() => {
+            if (!allAssetsLoaded) {
+                console.warn("Loading kelamaan, force open web...");
+                allAssetsLoaded = true;
+                finishLoading();
+            }
+        }, 8000); // 8 detik maksimal loading
 }
 
 function finishLoading() {
