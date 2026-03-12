@@ -93,18 +93,27 @@ function preloadAllAssets() {
 
 function finishLoading() {
     const preloaderBrand = document.querySelector(".preloader-brand span");
+    const preloader = document.getElementById('preloader');
+    
     if(preloaderBrand) gsap.to(preloaderBrand, { y: 0, duration: 0.8, ease: "power3.out" });
     
+    // Pastikan status emang beneran kelar
+    allAssetsLoaded = true;
+
     setTimeout(() => {
-        gsap.to("#preloader", { 
-            yPercent: -100, duration: 1.5, ease: "expo.inOut",
+        gsap.to(preloader, { 
+            yPercent: -100, 
+            duration: 1.2, 
+            ease: "expo.inOut",
+            display: "none", // Biar beneran ilang dari layar
             onComplete: () => {
                 window.lenis.start();
-                gsap.from(".hero-text-1 h1, .hero-text-1 p", { y: 30, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power3.out" });
                 initScrollAnimations();
+                // Refresh scrolltrigger biar ngga ngebug di HP
+                ScrollTrigger.refresh();
             }
         });
-    }, 500);
+    }, 600);
 }
 
 // 3. Setup Dynamic Events (Modal & Hovers)
