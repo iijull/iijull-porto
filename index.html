@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zul Hendra | Portfolio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] }, colors: { dark: '#000000', light: '#f4f4f4', modalBg: '#050505' } } }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="themes/light.css">
+    <link rel="stylesheet" href="themes/dark.css">
+    <link rel="stylesheet" href="themes/cyberpunk.css">
+</head>
+
+<body class="font-sans text-light theme-light">
+
+    <audio id="sfx-hover" preload="auto"><source src="https://cdn.pixabay.com/audio/2021/08/04/audio_2c94d039f6.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-open" preload="auto"><source src="https://cdn.pixabay.com/audio/2022/03/15/audio_5b30b42f62.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-close" preload="auto"><source src="https://cdn.pixabay.com/audio/2021/08/04/audio_bb630cc098.mp3" type="audio/mpeg"></audio>
+    <audio id="bg-music" src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" loop preload="auto"></audio>
+
+    <div class="noise-overlay"></div>
+
+    <div id="cursor">
+        <span id="cursor-text">VIEW</span>
+        <svg id="cursor-face" viewBox="0 0 100 100">
+            <g class="face-group" transform-origin="50 50">
+                <circle class="blush" cx="24" cy="55" r="7" fill="#ff7b7b" opacity="0" />
+                <circle class="blush" cx="76" cy="55" r="7" fill="#ff7b7b" opacity="0" />
+                <path class="sweat-drop" d="M 80 25 C 85 33, 85 38, 80 38 C 75 38, 75 33, 80 25 Z" fill="#000" opacity="0" />
+                <g class="eyes" transform-origin="50 50">
+                    <g class="eye-normal"><circle cx="32" cy="45" r="6" fill="#000" /><circle cx="68" cy="45" r="6" fill="#000" /></g>
+                    <g class="eye-happy" opacity="0"><path d="M 25 46 Q 32 36 39 46" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" /><path d="M 61 46 Q 68 36 75 46" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" /></g>
+                    <g class="eye-sad" opacity="0"><path d="M 25 42 Q 32 46 39 50" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" /><path d="M 61 50 Q 68 46 75 42" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" /></g>
+                    <g class="eye-angry" opacity="0"><path d="M 25 40 L 39 48" stroke="#000" stroke-width="5" stroke-linecap="round" /><path d="M 75 40 L 61 48" stroke="#000" stroke-width="5" stroke-linecap="round" /></g>
+                    <g class="eye-dizzy" opacity="0"><path class="spin-eye" d="M32,48 C32,43 37,43 37,48 C37,53 27,53 27,48 C27,41 39,41 39,48 C39,55 25,55 25,48" stroke="#000" stroke-width="3" fill="none"/><path class="spin-eye" d="M68,48 C68,43 73,43 73,48 C73,53 63,53 63,48 C63,41 75,41 75,48 C75,55 61,55 61,48" stroke="#000" stroke-width="3" fill="none"/></g>
+                </g>
+                <g class="mouths">
+                    <path class="mouth-smile" d="M 38 60 Q 50 75 62 60" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" />
+                    <path class="mouth-flat" d="M 42 65 L 58 65" stroke="#000" stroke-width="5" stroke-linecap="round" opacity="0" />
+                    <path class="mouth-sad" d="M 38 70 Q 50 58 62 70" stroke="#000" stroke-width="5" stroke-linecap="round" fill="none" opacity="0" />
+                    <ellipse class="mouth-o" cx="50" cy="65" rx="6" ry="8" stroke="#000" stroke-width="5" fill="none" opacity="0" />
+                    <path class="mouth-w" d="M 38 62 Q 44 70 50 62 Q 56 70 62 62" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0" />
+                    <path class="mouth-zigzag" d="M 35 65 L 42 60 L 50 65 L 58 60 L 65 65" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0" />
+                </g>
+                <g class="zzz-group" opacity="0">
+                    <text class="zzz-text" x="65" y="25" font-family="sans-serif" font-size="16" fill="#000" font-weight="bold">Z</text>
+                    <text class="zzz-text" x="80" y="10" font-family="sans-serif" font-size="12" fill="#000" font-weight="bold">z</text>
+                </g>
+                <g class="sunglasses" opacity="0" transform="translate(0, -5)">
+                    <path class="sunglasses-fill" d="M 22 40 L 42 40 L 38 52 L 26 52 Z" fill="#111" />
+                    <path class="sunglasses-fill" d="M 58 40 L 78 40 L 74 52 L 62 52 Z" fill="#111" />
+                    <path d="M 42 42 Q 50 38 58 42" stroke="#111" stroke-width="3" fill="none" />
+                    <path d="M 22 40 L 15 36 M 78 40 L 85 36" stroke="#111" stroke-width="3" fill="none" />
+                    <path d="M 24 42 L 30 42 L 28 50 L 25 50 Z" fill="#fff" opacity="0.3" stroke="none"/>
+                    <path d="M 60 42 L 66 42 L 64 50 L 61 50 Z" fill="#fff" opacity="0.3" stroke="none"/>
+                </g>
+            </g>
+        </svg>
+    </div>
+    
+    <div id="idle-bubble"></div>
+
+    <div id="preloader">
+        <div class="preloader-counter">0%</div>
+        <div class="preloader-brand"><span>Zul Hendra © 2026</span></div>
+        <div id="preloader-text">INITIALIZING...</div>
+    </div>
+
+    <button id="back-to-top" class="interactive" aria-label="Back to Top">
+        <svg class="absolute top-0 left-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 54 54">
+            <circle class="progress-ring__circle" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="transparent" r="25" cx="27" cy="27" />
+        </svg>
+        <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <div id="controls-wrapper">
+        <button id="sound-toggle" class="control-btn interactive" aria-label="Toggle Sound">
+            <svg class="w-5 h-5 icon-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+            <svg class="w-5 h-5 icon-on" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+        </button>
+        <button id="theme-toggle" class="control-btn interactive" aria-label="Toggle Theme">
+            <svg class="w-5 h-5 theme-icon-dark hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            <svg class="w-5 h-5 theme-icon-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <svg class="w-5 h-5 theme-icon-cyberpunk hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+        </button>
+        <span class="interaction-hint">Interact to immerse</span>
+    </div>
+
+    <div id="nav-wrapper">
+        <nav class="fixed top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 mix-blend-difference pointer-events-none">
+            <div class="font-serif italic text-xl pointer-events-auto cursor-pointer interactive magnetic-text">ZH.</div>
+            <div class="text-[10px] uppercase tracking-[0.15em] font-medium text-gray-300">Collaborating on meaningful creative projects.</div>
+        </nav>
+    </div>
+
+    <div id="project-modal" data-lenis-prevent>
+        <div class="modal-inner-bg"></div>
+        <div class="sticky top-0 left-0 w-full p-6 md:p-10 flex justify-between items-center z-50 mix-blend-difference pointer-events-none bg-gradient-to-b from-[#000000] to-transparent">
+            <div class="font-serif italic text-xl magnetic-text inline-block">ZH.</div>
+            <button id="close-modal" class="text-[10px] uppercase tracking-[0.15em] font-medium text-white pointer-events-auto hover:opacity-70 transition-opacity interactive">Close [X]</button>
+        </div>
+        <div class="w-full max-w-[1400px] mx-auto pt-20 pb-40 px-6 md:px-12 flex flex-col">
+            <div class="mb-20">
+                <h2 id="modal-title" class="font-serif text-[10vw] md:text-[8vw] leading-[0.9] mb-12 transform translate-y-10 opacity-0 will-change-transform magnetic-text inline-block">Project Title</h2>
+                <div id="modal-info" class="grid md:grid-cols-12 gap-10 border-t border-white/10 pt-10 transform translate-y-10 opacity-0 will-change-transform">
+                    <div class="md:col-span-8"><p id="modal-desc" class="text-gray-400 text-lg md:text-2xl font-light leading-relaxed">Project description goes here...</p></div>
+                    <div class="md:col-span-4 flex flex-col gap-6">
+                        <div><p class="text-[10px] uppercase tracking-widest text-gray-600 mb-2">Role & Services</p><p id="modal-role" class="text-sm font-light">Art Direction, Design</p></div>
+                        <div><p class="text-[10px] uppercase tracking-widest text-gray-600 mb-2">Year</p><p class="text-sm font-light">2026</p></div>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-gallery" class="columns-1 md:columns-2 gap-6 space-y-6 transform translate-y-10 opacity-0 will-change-transform"></div>
+        </div>
+    </div>
+
+    <div id="contact-modal" class="fixed inset-0 z-[999999] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-500">
+        <div class="contact-overlay absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+        <div class="contact-box relative w-[90%] max-w-lg bg-[#050505] border border-white/10 p-8 md:p-12 transform translate-y-10 transition-colors duration-500">
+            <button id="close-contact" class="absolute top-6 right-6 text-[10px] uppercase tracking-widest hover:opacity-60 transition-opacity interactive">Close [X]</button>
+            <h3 class="font-serif text-3xl md:text-4xl mb-2 magnetic-text inline-block">Get in Touch</h3>
+            <p class="text-xs text-gray-500 mb-8 tracking-widest uppercase">Drop me a message</p>
+            <form id="contact-form" class="flex flex-col gap-8" name="portfolio-contact" method="POST" data-netlify="true">
+                <input type="hidden" name="form-name" value="portfolio-contact" />
+                <div class="relative"><input type="text" id="sender-name" name="name" placeholder="Your Name" required class="w-full bg-transparent border-b border-white/20 pb-2 text-sm focus:outline-none focus:border-white transition-colors interactive text-white" /></div>
+                <div class="relative"><input type="email" id="sender-email" name="email" placeholder="Your Email" required class="w-full bg-transparent border-b border-white/20 pb-2 text-sm focus:outline-none focus:border-white transition-colors interactive text-white" /></div>
+                <div class="relative"><textarea id="sender-message" name="message" placeholder="Your Message" rows="4" required class="w-full bg-transparent border-b border-white/20 pb-2 text-sm focus:outline-none focus:border-white transition-colors interactive text-white resize-none"></textarea></div>
+                <p id="form-success-msg" class="text-[#00ffcc] text-xs tracking-widest uppercase text-center absolute bottom-[80px] w-full pointer-events-none">Message sent successfully!</p>
+                <button type="submit" class="mt-4 border border-white/20 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 interactive relative overflow-hidden group"><span class="relative z-10 font-bold" id="submit-btn-text">Send Message</span></button>
+            </form>
+        </div>
+    </div>
+
+    <section class="hero-section h-screen flex flex-col justify-center items-center relative overflow-hidden">
+        <div id="canvas-container"></div>
+        <div class="z-10 relative flex justify-center items-center w-full min-h-[200px] pointer-events-none" id="hero-text-wrapper">
+            <div class="hero-text-1 text-invert absolute w-full text-center flex flex-col items-center pointer-events-auto">
+                <h1 class="font-serif text-5xl md:text-7xl mb-4 font-normal tracking-wide magnetic-text inline-block">Zul Hendra.</h1>
+                <p class="text-[10px] md:text-xs uppercase tracking-[0.3em] font-semibold">Portfolio</p>
+            </div>
+            <div class="hero-text-2 text-invert absolute w-full text-center flex flex-col items-center opacity-0 pointer-events-auto">
+                <h1 class="font-serif text-4xl md:text-6xl mb-4 font-normal tracking-wide italic magnetic-text inline-block">Creative Designer.</h1>
+                <p class="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-semibold text-center leading-relaxed opacity-60">Visual & Branding <span class="mx-2">|</span> Multimedia <span class="mx-2">|</span> Concept <span class="mx-2">|</span> Product</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="main-bg-wrapper" class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden opacity-0 invisible">
+        <div id="main-3d-canvas" class="w-full h-full"></div>
+    </div>
+
+    <main id="main-content" class="w-full relative z-10">
+        
+        <div id="inject-branding"></div>
+        <div id="inject-multimedia"></div>
+        <div id="inject-concept"></div>
+        <div id="inject-product"></div>
+        <div id="inject-clients"></div>
+
+        <footer class="bg-black relative pt-40 pb-10 px-6 md:px-12 overflow-hidden flex flex-col justify-between min-h-[80vh] z-20">
+            <div id="footer-canvas-container" class="absolute inset-0 z-0 pointer-events-none opacity-0 invisible" style="mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%);"></div>
+            <div class="relative z-10 flex items-center gap-3 justify-center md:justify-start">
+                <div class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400">Exploring new creative opportunities</p>
+            </div>
+            <div class="relative z-10 flex-1 flex flex-col items-center justify-center my-20 w-full">
+                <div class="cta-wrapper relative group w-full text-center py-10 cursor-none interactive">
+                    <h2 class="cta-text font-serif text-[18vw] leading-[0.8] tracking-tighter text-white/80 group-hover:text-white transition-colors duration-500 will-change-transform drop-shadow-2xl magnetic-text inline-block">LET'S</h2>
+                    <h2 class="cta-text font-serif text-[18vw] leading-[0.8] tracking-tighter italic text-gray-400 group-hover:text-gray-200 transition-colors duration-500 will-change-transform drop-shadow-2xl magnetic-text inline-block">TALK.</h2>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <a href="#" class="email-trigger magnetic-btn pointer-events-auto w-28 h-28 md:w-40 md:h-40 bg-white text-black rounded-full flex flex-col items-center justify-center z-20 hover:bg-gray-200 transition-colors cursor-none shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+                            <span class="text-[10px] font-bold uppercase tracking-widest mb-1">Email Me</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-10 text-[10px] uppercase tracking-[0.2em] text-gray-500 gap-6">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <p>© 2026 Zul Hendra.</p><p class="hidden md:block">|</p><p id="local-time" class="font-mono text-gray-400">Jakarta, ID - 00:00:00</p>
+                </div>
+                <div class="flex gap-10">
+                    <a href="https://www.instagram.com/iijull/" target="_blank" class="hover:text-white transition-colors interactive transition-link">Instagram</a>
+                    <a href="https://www.linkedin.com/in/zul-hendra-82194024/" target="_blank" class="hover:text-white transition-colors interactive transition-link">LinkedIn</a>
+                    <a href="https://www.behance.net/iiijulll" target="_blank" class="hover:text-white transition-colors interactive transition-link">Behance</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="background.js"></script>
+    <script src="main.js"></script>
+    <script src="cursor.js"></script>
+</body>
+</html>

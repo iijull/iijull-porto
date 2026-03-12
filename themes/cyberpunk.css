@@ -1,0 +1,27 @@
+/* TEMA CYBERPUNK (NEON) */
+body.theme-cyberpunk { background-color: #050510; color: #00ffcc; text-shadow: 0 0 5px rgba(0,255,204,0.3); }
+body.theme-cyberpunk .bg-black { background-color: #050510 !important; }
+body.theme-cyberpunk .text-white { color: #00ffcc !important; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
+body.theme-cyberpunk .text-gray-400 { color: #ff00ff !important; text-shadow: 0 0 5px rgba(255,0,255,0.3); }
+body.theme-cyberpunk .text-gray-500 { color: #0088aa !important; }
+body.theme-cyberpunk .bg-zinc-900, body.theme-cyberpunk .bg-\[\#111\], body.theme-cyberpunk .bg-\[\#1a1a1a\], body.theme-cyberpunk .bg-\[\#222\], body.theme-cyberpunk .bg-\[\#2a2a2a\] { background-color: #0a0a1a !important; border-color: #00ffcc !important; box-shadow: 0 0 15px rgba(0,255,204,0.1); }
+body.theme-cyberpunk #project-modal { background-color: #050510 !important; }
+body.theme-cyberpunk .modal-inner-bg { background-color: #050510 !important; }
+
+body.theme-cyberpunk #cursor { mix-blend-mode: normal; background-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+body.theme-cyberpunk #cursor-text { color: #fff; }
+body.theme-cyberpunk #cursor-face circle:not(.blush), body.theme-cyberpunk #cursor-face path:not(.blush):not(.sweat-drop):not(.sunglasses-fill), body.theme-cyberpunk #cursor-face text { stroke: #fff; }
+body.theme-cyberpunk #cursor-face .eye-normal circle, body.theme-cyberpunk #cursor-face .sunglasses path:nth-child(1), body.theme-cyberpunk #cursor-face .sunglasses path:nth-child(2) { fill: #fff; }
+
+body.theme-cyberpunk .text-invert { color: #00ffcc; mix-blend-mode: normal; }
+body.theme-cyberpunk .noise-overlay { mix-blend-mode: color-dodge; opacity: 0.1; background-color: rgba(0, 255, 204, 0.05); }
+body.theme-cyberpunk ::selection { background-color: rgba(255,0,255,0.4); color: #00ffcc; }
+
+body.theme-cyberpunk .contact-box { background-color: #0a0a1a; border-color: #00ffcc; box-shadow: 0 0 20px rgba(0,255,204,0.1); }
+body.theme-cyberpunk .contact-box input, body.theme-cyberpunk .contact-box textarea { color: #00ffcc; border-color: rgba(0,255,204,0.3); }
+body.theme-cyberpunk .contact-box input:focus, body.theme-cyberpunk .contact-box textarea:focus { border-color: #00ffcc; box-shadow: 0 10px 10px -10px rgba(0,255,204,0.5); }
+body.theme-cyberpunk .contact-box input::placeholder, body.theme-cyberpunk .contact-box textarea::placeholder { color: rgba(0,255,204,0.4); }
+body.theme-cyberpunk .contact-box button[type="submit"] { border-color: #ff00ff; color: #ff00ff; }
+body.theme-cyberpunk .contact-box button[type="submit"]:hover { background-color: #ff00ff; color: #fff; box-shadow: 0 0 15px #ff00ff; text-shadow: none; }
+body.theme-cyberpunk #idle-bubble { color: #00ffcc; border-color: #ff00ff; background: rgba(10,10,26,0.8); box-shadow: 0 0 15px rgba(255,0,255,0.3); }
+body.theme-cyberpunk #idle-bubble span.highlight { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }

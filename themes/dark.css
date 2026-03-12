@@ -1,0 +1,3 @@
+/* TEMA DARK (GELAP / BAWAAN AWAL) */
+body.theme-dark { background-color: #000000; color: #ffffff; }
+/* Selebihnya ngikut bawaan tailwind dan style dasar */
